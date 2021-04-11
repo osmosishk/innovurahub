@@ -55,12 +55,6 @@ class MemoryZoneSerializer(serializers.ModelSerializer):
         return JsonResponse({'slave_address_delete': True})
 
 
-#disable
-class MemoryZoneHistorySerializer(serializers.ModelSerializer):
-    class Meta:
-        model = MemoryZoneHistory
-        fields = ('time_of_picking', 'memory_zone', 'value')
-
 
 
 class DataHistorySerializer(serializers.ModelSerializer):

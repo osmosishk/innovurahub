@@ -1,10 +1,12 @@
 import minimalmodbus
-
+from django.conf import settings
 from slaves_app import my_own_lib
 from slaves_app.models import Slave , DataHistory
 from slaves_app.serializers import MemoryZoneSerializer, SlaveSerializer
+import redis
 import json
 
+redis_instance = redis.StrictRedis(host=settings.REDIS_HOST,port=settings.REDIS_PORT, db=0)
 
 def read_sensors_values(slaves):
     for slave in slaves:
@@ -28,6 +30,11 @@ def read_register_address_json(slave):
         units = each_address.get_unit()
         value =each_address.read_value(slave_instrument)
         data[fieldname]=value
+
+    ##json_input = json.dumps(data)
+    ##redis_instance.lpush(slave.job_id, json_input)
+
+
 
     print(data)
     DataHistory.objects.create(slaveid = slave.slave_address ,jobid=slave.job_id, data=data).save()

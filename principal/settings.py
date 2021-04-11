@@ -42,6 +42,9 @@ CELERY_TIMEZONE = 'Asia/Hong_Kong'
 CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
 # Application definition
 
+REDIS_HOST = 'localhost'
+REDIS_PORT = 6379
+
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',

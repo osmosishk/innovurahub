@@ -141,7 +141,7 @@ def dataloggerstatus(request):
 
     if request.method == 'GET':
         task = PeriodicTask.objects.get(name='every-15-seconds')
-
+        print(task.enabled)
         data = {'status': task.enabled}
         return JsonResponse(data)
 
