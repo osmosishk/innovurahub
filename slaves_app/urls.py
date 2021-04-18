@@ -19,6 +19,7 @@ urlpatterns = [path('slave_search/', views.look_for_slaves),
                path('data/<int:job_id>/', views.showdata),
                path('instantdata/<int:job_id>/', views.showinstantdata),
                path('deletedata/<int:job_id>/', views.deletedata),
+               path('redis/', views.getredisdata),
 
                ]
 urlpatterns += router.urls

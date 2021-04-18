@@ -16,7 +16,11 @@ from slaves_app.serializers import SettingSerializer, SlaveSerializer, MemoryZon
 from . import my_own_lib
 from .functions import \
     get_slaves_the_client_is_looking_for, convert_list_of_slaves_to_json_format, \
-    link_memory_zones_with_their_slave_in_a_json_format, get_all_memory_zones_for_each_slave_in_json_format
+    link_memory_zones_with_their_slave_in_a_json_format, get_all_memory_zones_for_each_slave_in_json_format , get_redis_key
+
+
+
+
 
 
 class SettingViewSet(viewsets.ModelViewSet):
@@ -87,6 +91,17 @@ def showinstantdata(request,job_id):
     tasks = DataHistory.objects.filter(jobid=job_id).order_by('-id')[:5]
     serializer = DataHistorySerializer(tasks, many=True)
     return Response(serializer.data)
+
+
+@api_view(['GET'])
+def getredisdata(request):
+
+    if request.method == 'GET':
+        tasks=get_redis_key(request);
+
+    return JsonResponse(tasks , safe=False)
+
+
 
 
 @api_view(['POST'])

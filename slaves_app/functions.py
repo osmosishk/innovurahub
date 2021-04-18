@@ -5,8 +5,17 @@ from slaves_app.models import Slave , DataHistory
 from slaves_app.serializers import MemoryZoneSerializer, SlaveSerializer
 import redis
 import json
+import datetime
+import codecs
 
-redis_instance = redis.StrictRedis(host=settings.REDIS_HOST,port=settings.REDIS_PORT, db=0)
+redis_instance = redis.StrictRedis(host=settings.REDIS_HOST,port=settings.REDIS_PORT, charset="utf-8", decode_responses=True ,db=0)
+iot_host='raspberry_104'
+
+
+def myconverter(o):
+    if isinstance(o, datetime.datetime):
+        return o.isoformat()
+
 
 def read_sensors_values(slaves):
     for slave in slaves:
@@ -22,24 +31,29 @@ def read_register_address(slave):
 def read_register_address_json(slave):
     data= {}
 
+    data['slavid_id'] = slave.slave_address
+    data['iot_id'] = slave.job_id
+    data['time'] = datetime.datetime.now()
+
     slave_instrument = create_slave_instrument(slave)    # create Modbus Slave
     slave_register_address= slave.get_register_address() # read each address of each slave
 
     for each_address in slave_register_address:
         fieldname = each_address.get_fieldname()
         units = each_address.get_unit()
-        value =each_address.read_value(slave_instrument)
-        data[fieldname]=value
+        value = each_address.read_value(slave_instrument)
+        data[fieldname] = value
 
-    ##json_input = json.dumps(data)
-    ##redis_instance.lpush(slave.job_id, json_input)
+
+
+
+    json_input = json.dumps(data ,default = myconverter)
+    redis_instance.lpush(iot_host, json_input)
 
 
 
     print(data)
-    DataHistory.objects.create(slaveid = slave.slave_address ,jobid=slave.job_id, data=data).save()
-
-
+    ##DataHistory.objects.create(slaveid = slave.slave_address ,jobid=slave.job_id, data=data).save()
 
 def create_slave_instrument(slave):
     instrument = minimalmodbus.Instrument('/dev/ttyUSB0', slave.slave_address)
@@ -50,6 +64,19 @@ def create_slave_instrument(slave):
     instrument.serial.timeout = slave.setting.timeout
     instrument.mode = minimalmodbus.MODE_RTU
     return instrument
+
+
+
+def get_redis_key(request):
+    result=[]
+
+    getdata=redis_instance.lrange(iot_host,0,10)
+
+    for o in getdata:
+        b= json.loads(o)
+        result.append(b)
+
+    return result
 
 
 def get_slaves_the_client_is_looking_for(request):
