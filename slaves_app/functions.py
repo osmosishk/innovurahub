@@ -7,10 +7,12 @@ import redis
 import json
 import datetime
 import codecs
+import socket
 
-redis_instance = redis.StrictRedis(host=settings.REDIS_HOST,port=settings.REDIS_PORT, charset="utf-8", decode_responses=True ,db=0)
-iot_host='raspberry_104'
 
+redis_instance = redis.StrictRedis(host=settings.REDIS_HOST,port=settings.REDIS_PORT, charset="utf-8", decode_responses=True ,password=settings.REDIS_PWD , db=0)
+iot_host = socket.gethostname()
+redis_key='raspberry'
 
 def myconverter(o):
     if isinstance(o, datetime.datetime):
@@ -33,7 +35,8 @@ def read_register_address_json(slave):
 
     data['slavid_id'] = slave.slave_address
     data['iot_id'] = slave.job_id
-    data['time'] = datetime.datetime.now()
+    data['iot_host'] = iot_host
+    data['time'] = datetime.datetime.utcnow()
 
     slave_instrument = create_slave_instrument(slave)    # create Modbus Slave
     slave_register_address= slave.get_register_address() # read each address of each slave
@@ -48,7 +51,7 @@ def read_register_address_json(slave):
 
 
     json_input = json.dumps(data ,default = myconverter)
-    redis_instance.lpush(iot_host, json_input)
+    redis_instance.lpush(redis_key, json_input)
 
 
 
