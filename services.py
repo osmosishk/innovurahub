@@ -1,7 +1,7 @@
 import sys
 from bluepy.btle import UUID, Peripheral
 
-device='20:05:11:10:0a:52'
+device='9c:a5:25:d8:1e:c9'
 
 p = Peripheral(device,"public")
 

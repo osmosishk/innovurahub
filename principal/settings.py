@@ -59,7 +59,9 @@ INSTALLED_APPS = [
     'django_celery_results',
     'rest_framework_swagger',
     'django_mysql',
+
 ]
+INSTALLED_APPS += ("redisboard", )
 
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [

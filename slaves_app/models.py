@@ -20,7 +20,10 @@ class Setting(models.Model):
     timeout = models.FloatField()
 
     def __str__(self):
-        return self.baud
+        return '{} / {}'.format(self.baudrate , self.pk)
+
+
+
 
 
 class Slave(models.Model):
@@ -39,7 +42,8 @@ class Slave(models.Model):
 
 
     def __str__(self):
-        return self.name
+        return '{}'.format(self.name)
+
 
     def get_register_address(self):
         return MemoryZone.objects.filter(slave=self)
