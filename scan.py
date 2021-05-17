@@ -29,12 +29,15 @@ if len(devices) < 1:
 else:
     for dev in devices:
         for adtype, desc, value in dev.getScanData():
-            if (desc == "Complete Local Name") and (value == "Innovura_IOT"):
+            if (desc == "Complete Local Name") and ((value == "Innovura_IOT") or (value == "WH-BLE 103")):
                 if dev.addr in oldaddr_var:
                     print("Device found list %s (%s), RSSI=%d dB" % (dev.addr, dev.addrType, dev.rssi))
                 else:
                     print("New Device found list %s (%s), RSSI=%d dB" % (dev.addr, dev.addrType, dev.rssi))
                 newaddr_var.append(dev.addr)
+
+
+
 
 
 

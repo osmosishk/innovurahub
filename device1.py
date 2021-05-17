@@ -5,7 +5,7 @@ from bluepy.btle import Scanner, DefaultDelegate
 global addr_var
 global delegate_global
 global perif_global
-
+run_once = 0
 import json
 from datetime import datetime
 import socket
@@ -13,14 +13,25 @@ iot_host = socket.gethostname()
 import requests
 url = 'http://192.46.225.215:8080'
 headers = {"content-type : ": "application/json"}
-addr_var = ['9c:a5:25:df:c6:3c', '9c:a5:25:df:fc:f3', '9c:a5:25:d8:1e:c9']
-#addr_var=[]
+#addr_var = ['9c:a5:25:df:c6:3c', '9c:a5:25:df:fc:f3', '9c:a5:25:d8:1e:c9','9c:a5:25:df:bb:af']
+addr_var=[]
+i_run_once_has_been_run = True
 
-#file_in = open("device.json", "r")
-#for line in file_in:
-#    addr_var.append(line.rstrip('\n'))
 
-#print(addr_var)
+def openfile():
+    print("function was called")
+    global i_run_once_has_been_run
+    if i_run_once_has_been_run:
+        file_in = open("device.json", "r")
+        for line in file_in:
+            addr_var.append(line.rstrip('\n'))
+    i_run_once_has_been_run = False
+
+
+
+
+
+
 
 class MyDelegate(btle.DefaultDelegate):
 
@@ -47,11 +58,11 @@ class MyDelegate(btle.DefaultDelegate):
                 result = data_decoded.split(",")
                 for y in result:
                     if (y.split(":", 1)[0] == '1'):
-                        datajson['value'] = y.split(":", 1)[1]
+                        datajson['value'] = float(y.split(":", 1)[1])
                     if (y.split(":", 1)[0] == '2'):
-                        datajson['sensor'] = y.split(":", 1)[1]
+                        datajson['sensor'] = int(y.split(":", 1)[1])
                     if (y.split(":", 1)[0] == '3'):
-                        datajson['battery'] = y.split(":", 1)[1]
+                        datajson['battery'] = float(y.split(":", 1)[1])
 
                 print(datajson)
 
@@ -81,6 +92,7 @@ def perif_loop(perif, indx):
             print("disconnecting perif: " + perif.addr + ", index: " + str(indx))
             reestablish_connection(perif, perif.addr, indx)
 
+openfile()
 
 delegate_global = []
 perif_global = []
@@ -108,6 +120,7 @@ def establish_connection(addr):
         try:
             for jj in range(len(addr_var)):
                 if addr_var[jj] == addr:
+                    print(addr)
                     handle = 15
                     print("Attempting to connect with " + addr + " at index: " + str(jj))
                     p = btle.Peripheral(addr)
@@ -121,7 +134,6 @@ def establish_connection(addr):
         except:
             print("failed to connect to " + addr)
             continue
-
 
 
 
